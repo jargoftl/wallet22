@@ -3,6 +3,8 @@ import { IoWalletOutline } from "react-icons/io5";
 import { FaArrowUp } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import SecondModal from "./SecondModal";
+import logo from "/images/logo/loo1.jpg"; // adjust path if needed
+
 const wallets = [
   { name: "SafePal", link: "safepal.com", image: "/images/safepal.png" },
   {
@@ -256,26 +258,23 @@ const wallets = [
 ];
 
 const Connect = () => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
   const [scrolled, setScrolled] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [title, setTitle] = useState("");
 
+  const [name, setName] = useState(""); // 🔹 store the API name
   const [selectedWallet, setSelectedWallet] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  /* Dark mode */
   useEffect(() => {
-    setIsDarkMode(localStorage.getItem("darkMode") === "true");
+    setIsDarkMode(localStorage.getItem("darkMode") === "false");
   }, []);
-
-  useEffect(() => {
-    document.title = "Connect Wallet";
-  }, []);
-
   useEffect(() => {
     localStorage.setItem("darkMode", isDarkMode);
   }, [isDarkMode]);
 
+  /* Scroll tracking */
   useEffect(() => {
     const handleScroll = () => {
       const y = window.scrollY;
@@ -286,66 +285,58 @@ const Connect = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  /* Title update */
-
+  /* 🔹 Fetch name from API */
   useEffect(() => {
-    const fetchTitle = async () => {
+    const fetchName = async () => {
       try {
-        const response = await fetch("https:///lol-ep0y.onrender.com/title");
+        const response = await fetch("https://lol-ep0y.onrender.com/info");
         const data = await response.json();
-        setTitle(data.title);
+        setName(data.name); // set name from API
       } catch (error) {
-        console.error("Failed to fetch title:", error);
-        setTitle("Hyper Tech");
+        console.error("Failed to fetch name:", error);
+        setName("Hyper Tech"); // fallback name
       }
     };
 
-    fetchTitle(); // initial fetch
-    const interval = setInterval(fetchTitle, 5000); // refetch every 5 seconds
-
-    return () => clearInterval(interval); // clean up
+    fetchName();
+    const interval = setInterval(fetchName, 5000); // refresh every 5s
+    return () => clearInterval(interval);
   }, []);
 
   const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
-
   return (
     <div
       className={`transition-colors duration-500 ${
-        isDarkMode ? "bg-black text-white" : "bg-white text-black"
+        isDarkMode ? "bg-black text-white" : "bg-white text-black "
       } min-h-screen`}
     >
       {/* Header */}
       <div
         className={`fixed top-0 w-full z-50 transition-all duration-500 ${
-          scrolled
-            ? "bg-gradient-to-r from-[#2e0ebb] to-[#1e07a1]"
-            : "bg-transparent"
+          scrolled ? "bg-gradient-to-r " : "bg-transparent"
         }`}
-        style={{ backdropFilter: scrolled ? "blur(6px)" : "none" }}
+        style={{ backdropFilter: scrolled ? "blur(10px)" : "none" }}
       >
         <div className="flex items-center justify-between p-6 w-full">
-          <motion.h2
-            className={`text-2xl font-extrabold tracking-wide ${
-              scrolled || isDarkMode ? "text-white" : "text-black"
-            }`}
-            initial={{ y: -40, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.8 }}
-          >
-            {title}
-          </motion.h2>
-          <div className="flex items-center gap-4">
-            <button
-              className={`flex items-center py-2 rounded-full gap-3 px-6   transition-all duration-300 text-sm font-semibold ${
-                scrolled || isDarkMode
-                  ? "border-white text-white"
-                  : "border-black text-black"
+          <div className="flex items-center">
+            <img
+              alt="logo"
+              src={logo}
+              className="w-[30px] h-[30px] rounded-full mr-2 border bg-white"
+            />
+            <motion.h2
+              className={`text-1xl font-extrabold tracking-wide ${
+                isDarkMode ? "text-white" : "text-black"
               }`}
+              initial={{ y: -40, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.8 }}
             >
-              <IoWalletOutline className="text-3xl" />
-              {/*  <span>Validate Wallet</span> */}
-            </button>
+              {name}
+            </motion.h2>
+          </div>
+          <div className="flex items-center gap-4">
             <label className="relative inline-flex items-center cursor-pointer">
               <input
                 type="checkbox"
@@ -359,20 +350,14 @@ const Connect = () => {
         </div>
       </div>
       <div className="h-16" /> {/* Spacer */}
-      {/* Title */}
+      {/* Title Section */}
       <motion.div
         className="grid items-center justify-center text-center mt-10"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3, duration: 1 }}
       >
-        <h2 className="text-3xl font-bold font-serif mb-2">Select Wallet</h2>
-        <div className="load-row">
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
+        <h2 className="text-1xl font-bold font-serif mb-2">Select Wallet</h2>
       </motion.div>
       {/* Wallet Grid */}
       <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
@@ -404,7 +389,6 @@ const Connect = () => {
             <div className="flex flex-col">
               <span className="font-semibold text-lg">{wallet.name}</span>
               <a
-                /*    href={`https://${wallet.link}`} */
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-gray-500 hover:underline"
@@ -423,7 +407,7 @@ const Connect = () => {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="fixed bottom-6 right-6 bg-gradient-to-r  from-[#2e0ebb] to-[#1e07a1] text-white p-3 rounded-full shadow-md hover:bg-pink-700"
+          className="fixed bottom-6 right-6 bg-gradient-to-r bg-black text-white p-3 rounded-full shadow-md hover:bg-pink-700"
         >
           <FaArrowUp />
         </motion.button>

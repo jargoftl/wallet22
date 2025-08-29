@@ -4,7 +4,7 @@ import AdminPage from "./AdminPage";
 const Passwordpage = () => {
   const [password, setPassword] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const correctPassword = "40602"; // Replace this with your desired password
+  const correctPassword = "50100"; // Replace this with your desired password
 
   const handleSubmit = (e) => {
     e.preventDefault();
